@@ -4,12 +4,43 @@ import { Icon } from '@iconify/react'
 
 function App() {
   const [businesses, setBusinesses] = useState([])
+  const [filtered, setFiltered] = useState(businesses)
+  const [isFiltering, setIsFiltering] = useState(false)
   const [cities, setCities] = useState([])
+  const [filterOptions, setFilterOptions] = useState({
+    city: null,
+    industry: null,
+    year: null,
+  })
+
+  const handleClickCity = (clickedCity) => {
+    setFilterOptions({ ...filterOptions, city: clickedCity })
+  }
+
+  const handleClickFilter = () => {
+    if (Object.values(filterOptions).every((option) => !option)) return
+
+    setIsFiltering(true)
+
+    const results = [...businesses].filter(
+      (business) =>
+        business.city.toLowerCase() === filterOptions.city.toLowerCase()
+    )
+
+    setFiltered(results)
+  }
+
+  const handleClickReset = () => {
+    setIsFiltering(false)
+    setFilterOptions({})
+    setFiltered([])
+  }
 
   useEffect(() => {
     ;(async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/businesses/15`)
+        const URL = `http://localhost:3000/api/businesses/15`
+        const response = await fetch(URL)
         if (!response.ok) {
           throw new Error('Network response was not ok')
         }
@@ -92,7 +123,7 @@ function App() {
           <div className="stat-desc text-secondary">31 tasks remaining</div>
         </div>
       </div>
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-col md:flex-row">
         <label className="input">
           <svg
             className="h-[1em] opacity-50"
@@ -122,7 +153,9 @@ function App() {
         <select defaultValue="Pick a color" className="select">
           <option disabled={true}>City</option>
           {cities.map((city, ind) => (
-            <option key={ind}>{city}</option>
+            <option key={ind} onClick={() => handleClickCity(city)}>
+              {city}
+            </option>
           ))}
         </select>
         <select defaultValue="Pick a color" className="select">
@@ -131,7 +164,12 @@ function App() {
           <option>2024</option>
           <option>2023</option>
         </select>
-        <button className="btn">Filter</button>
+        <button className="btn btn-primary" onClick={handleClickFilter}>
+          <Icon icon="mynaui:filter" /> Filter
+        </button>
+        <button className="btn btn-neutral" onClick={handleClickReset}>
+          <Icon icon="system-uicons:reset" /> Reset
+        </button>
       </div>
       <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
         <table className="table table-zebra">
@@ -145,22 +183,37 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {/* row 1 */}
-            {businesses.map((business, ind) => (
-              <tr className="hover:bg-base-300" key={business.id}>
-                <th>{ind + 1}</th>
-                <td className="font-bold">
-                  <a
-                    href={`https://www.google.com/search?q=${business.businessName} Los Angeles`}
-                    target="_blank"
-                  >
-                    {business.businessName}
-                  </a>
-                </td>
-                <td>{business.city}</td>
-                <td>Blue</td>
-              </tr>
-            ))}
+            {isFiltering
+              ? filtered.map((business, ind) => (
+                  <tr className="hover:bg-base-300" key={business.id}>
+                    <th>{ind + 1}</th>
+                    <td className="font-bold">
+                      <a
+                        href={`https://www.google.com/search?q=${business.businessName} Los Angeles`}
+                        target="_blank"
+                      >
+                        {business.businessName}
+                      </a>
+                    </td>
+                    <td>{business.city}</td>
+                    <td>Blue</td>
+                  </tr>
+                ))
+              : businesses.map((business, ind) => (
+                  <tr className="hover:bg-base-300" key={business.id}>
+                    <th>{ind + 1}</th>
+                    <td className="font-bold">
+                      <a
+                        href={`https://www.google.com/search?q=${business.businessName} Los Angeles`}
+                        target="_blank"
+                      >
+                        {business.businessName}
+                      </a>
+                    </td>
+                    <td>{business.city}</td>
+                    <td>Blue</td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>
