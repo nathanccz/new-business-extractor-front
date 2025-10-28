@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import { Icon } from '@iconify/react'
+import Select from 'react-select'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
+import Skeleton from './components/Skeleton'
 
 function App() {
+  const [totalBusinesses, setTotalBusinesses] = useState(0)
   const [businesses, setBusinesses] = useState([])
   const [filtered, setFiltered] = useState(businesses)
   const [isFiltering, setIsFiltering] = useState(false)
   const [cities, setCities] = useState([])
+  const [resultsPerPage, setResultsPerPage] = useState(50)
+  const [isLoading, setIsLoading] = useState(false)
+  const [topCities, setTopCities] = useState([])
+  const [searchEngine, setSearchEngine] = useState('')
   const [filterOptions, setFilterOptions] = useState({
     city: null,
     industry: null,
@@ -32,23 +41,59 @@ function App() {
 
   const handleClickReset = () => {
     setIsFiltering(false)
-    setFilterOptions({})
+    setFilterOptions({
+      city: null,
+      industry: null,
+      year: null,
+    })
     setFiltered([])
   }
 
+  const handleSearchEngineChange = (selectedOption) => {
+    setSearchEngine(selectedOption.value)
+    localStorage.setItem('search_engine', selectedOption.value)
+  }
+
+  const resultsPerPageOptions = [50, 100, 200, 300, 400, 500]
+
+  const searchEngineUrls = {
+    google: 'https://www.google.com/search?q=',
+    duckduckgo: 'https://duckduckgo.com/?q=',
+    bing: 'https://www.bing.com/search?q=',
+  }
+
+  const searchEngineOptions = [
+    { value: 'google', label: 'Google' },
+    { value: 'duckduckgo', label: 'DuckDuckGo' },
+    { value: 'bing', label: 'Bing' },
+  ]
+
   useEffect(() => {
     ;(async () => {
+      setIsLoading(true)
       try {
-        const URL = `http://localhost:3000/api/businesses/15`
-        const response = await fetch(URL)
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
+        const TOTAL_URL = `http://localhost:3000/api/businesses`
+        const TRENDING_URL = `http://localhost:3000/api/businesses/trending`
+
+        const [newBusinessesRes, topCitiesRes] = await Promise.all([
+          fetch(TOTAL_URL),
+          fetch(TRENDING_URL),
+        ])
+
+        const newBusinessesData = await newBusinessesRes.json()
+        const topCitiesData = await topCitiesRes.json()
+        const searchEnginePreference = localStorage.getItem('search_engine')
+        console.log(newBusinessesData)
+        if (!searchEnginePreference) {
+          setSearchEngine('google')
+        } else {
+          setSearchEngine(searchEnginePreference)
         }
-        const data = await response.json()
-        const array = data.data
-        setBusinesses(array)
+
+        setBusinesses(newBusinessesData.data)
+        setTopCities(topCitiesData.map((el) => el.city))
         setCities(
-          array
+          newBusinessesData.data
             .map((el) =>
               el.city
                 .split(' ')
@@ -56,74 +101,45 @@ function App() {
                 .join(' ')
             )
             .filter((el, i, arr) => arr.lastIndexOf(el) === i)
+            .sort((a, b) => a.localeCompare(b))
         )
-        console.log(array)
+        setTotalBusinesses(newBusinessesData.total)
+        setIsLoading(false)
       } catch (error) {
         console.log(error)
       }
     })()
   }, [])
 
-  return (
-    <main className="flex flex-col gap-3">
-      <h1 className="text-3xl font-bold">New Businesses (October 2025)</h1>
-      <div className="stats shadow">
+  return !isLoading ? (
+    <main className="relative flex flex-col gap-3">
+      <Navbar />
+
+      {/* TOP STATISTICS CALLOUT: ROW 1 */}
+      <div className="stats shadow flex flex-col md:flex-row mb-3">
         <div className="stat">
           <div className="stat-figure text-primary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="inline-block h-8 w-8 stroke-current"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              ></path>
-            </svg>
+            <Icon icon="ic:baseline-business" className="text-3xl" />
           </div>
-          <div className="stat-title">Total Likes</div>
-          <div className="stat-value text-primary">25.6K</div>
+          <div className="stat-title">Total New Businesses</div>
+          <div className="stat-value text-primary">{totalBusinesses}</div>
           <div className="stat-desc">21% more than last month</div>
         </div>
 
         <div className="stat">
-          <div className="stat-figure text-secondary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="inline-block h-8 w-8 stroke-current"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              ></path>
-            </svg>
-          </div>
-          <div className="stat-title">Page Views</div>
-          <div className="stat-value text-secondary">2.6M</div>
-          <div className="stat-desc">21% more than last month</div>
-        </div>
-
-        <div className="stat">
-          <div className="stat-figure text-secondary">
-            <div className="avatar avatar-online">
-              <div className="w-16 rounded-full">
-                <img src="https://img.daisyui.com/images/profile/demo/anakeen@192.webp" />
+          <div className="stat-title mb-3">Top Neighborhoods</div>
+          <div className="flex flex-wrap gap-3">
+            {topCities.map((city) => (
+              <div class="badge badge-accent cursor-pointer hover:bg-primary duration-500">
+                {city}
               </div>
-            </div>
+            ))}
           </div>
-          <div className="stat-value">86%</div>
-          <div className="stat-title">Tasks done</div>
-          <div className="stat-desc text-secondary">31 tasks remaining</div>
         </div>
       </div>
-      <div className="flex gap-3 flex-col md:flex-row">
+
+      {/* FILTER INPUT FIELD */}
+      <div className="flex gap-3 flex-col md:flex-row mb-3">
         <label className="input">
           <svg
             className="h-[1em] opacity-50"
@@ -141,37 +157,98 @@ function App() {
               <path d="m21 21-4.3-4.3"></path>
             </g>
           </svg>
-          <input type="search" className="grow" placeholder="Search" />
+          <input type="search" className="grow" placeholder="Search business" />
         </label>
-
-        <select defaultValue="Pick a color" className="select">
-          <option disabled={true}>Industry</option>
+        <select className="select">
+          <option disabled={true} selected>
+            Industry
+          </option>
           <option>Crimson</option>
           <option>Amber</option>
           <option>Velvet</option>
         </select>
-        <select defaultValue="Pick a color" className="select">
-          <option disabled={true}>City</option>
+        <select className="select" value={filterOptions.city}>
+          <option disabled={true} selected>
+            City
+          </option>
           {cities.map((city, ind) => (
             <option key={ind} onClick={() => handleClickCity(city)}>
               {city}
             </option>
           ))}
         </select>
-        <select defaultValue="Pick a color" className="select">
+        <select className="select w-[100px]">
           <option disabled={true}>Year</option>
-          <option>2025</option>
+          <option selected>2025</option>
           <option>2024</option>
           <option>2023</option>
         </select>
-        <button className="btn btn-primary" onClick={handleClickFilter}>
+        <button
+          className="btn btn-primary cursor-pointer"
+          onClick={handleClickFilter}
+        >
           <Icon icon="mynaui:filter" /> Filter
         </button>
-        <button className="btn btn-neutral" onClick={handleClickReset}>
+        <button
+          className="btn btn-neutral cursor-pointer"
+          onClick={handleClickReset}
+        >
           <Icon icon="system-uicons:reset" /> Reset
         </button>
       </div>
-      <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+
+      {/* NEW BUSINESS RESULTS TABLE */}
+      <div className="flex flex-col md:flex-row justify-between gap-3">
+        <div className="text-left">
+          <h1 className="text-lg font-bold">
+            Newly Registered Businesses (Sept. 2025)
+          </h1>
+          <span className="italic text-xs">
+            Last updated: October 1, 2025. Public data sourced from the Los
+            Angeles{' '}
+            <a
+              href="https://finance.lacity.gov/"
+              target="_blank"
+              className="underline"
+            >
+              Office of Finance
+            </a>
+            .
+          </span>
+        </div>
+        <div className="w-full flex justify-end">
+          {/* <div className="max-w-[30%]">
+            <Select
+              defaultValue={searchEngine}
+              onChange={handleSearchEngineChange}
+              options={searchEngineOptions}
+            />
+          </div> */}
+          <div className="sm: w-[70%] md:w-[40%] flex gap-3">
+            <select className="select">
+              <option disabled={true}>Results per page</option>
+              {resultsPerPageOptions.map((option, ind) => (
+                <option key={ind} onClick={() => setResultsPerPage(option)}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <select className="select">
+              <option disabled={true}>Search with...</option>
+              <option onClick={() => handleClickSearchEngine('google')}>
+                Google
+              </option>
+              <option onClick={() => handleClickSearchEngine('duckduckgo')}>
+                DuckDuckGo
+              </option>
+              <option onClick={() => handleClickSearchEngine('bing')}>
+                Bing
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 max-h-[60vh]">
         <table className="table table-zebra">
           {/* head */}
           <thead>
@@ -189,7 +266,7 @@ function App() {
                     <th>{ind + 1}</th>
                     <td className="font-bold">
                       <a
-                        href={`https://www.google.com/search?q=${business.businessName} Los Angeles`}
+                        href={`${searchEngineUrls[searchEngine]}${business.businessName} Los Angeles`}
                         target="_blank"
                       >
                         {business.businessName}
@@ -204,7 +281,7 @@ function App() {
                     <th>{ind + 1}</th>
                     <td className="font-bold">
                       <a
-                        href={`https://www.google.com/search?q=${business.businessName} Los Angeles`}
+                        href={`${searchEngineUrls[searchEngine]}${business.businessName} Los Angeles`}
                         target="_blank"
                       >
                         {business.businessName}
@@ -217,7 +294,10 @@ function App() {
           </tbody>
         </table>
       </div>
+      <Footer />
     </main>
+  ) : (
+    <Skeleton />
   )
 }
 
