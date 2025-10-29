@@ -301,7 +301,9 @@ function App() {
         {Array.from({ length: pages }, (_, i) => (
           <button
             key={i}
-            className="join-item btn"
+            className={`join-item btn ${
+              currentPage === i + 1 ? 'btn-active' : ''
+            }`}
             onClick={() => setCurrentPage(i + 1)}
           >
             {i + 1}
