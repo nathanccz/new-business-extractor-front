@@ -14,6 +14,8 @@ function App() {
   const [cities, setCities] = useState([])
   const [resultsPerPage, setResultsPerPage] = useState(50)
   const [isLoading, setIsLoading] = useState(false)
+  const [pages, setPages] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
   const [topCities, setTopCities] = useState([])
   const [searchEngine, setSearchEngine] = useState('')
   const [filterOptions, setFilterOptions] = useState({
@@ -72,7 +74,7 @@ function App() {
     ;(async () => {
       setIsLoading(true)
       try {
-        const TOTAL_URL = `http://localhost:3000/api/businesses`
+        const TOTAL_URL = `http://localhost:3000/api/businesses/${currentPage}`
         const TRENDING_URL = `http://localhost:3000/api/businesses/trending`
 
         const [newBusinessesRes, topCitiesRes] = await Promise.all([
@@ -91,6 +93,7 @@ function App() {
         }
 
         setBusinesses(newBusinessesData.data)
+        setPages(Math.floor(newBusinessesData.total / 50))
         setTopCities(topCitiesData.map((el) => el.city))
         setCities(
           newBusinessesData.data
@@ -109,7 +112,7 @@ function App() {
         console.log(error)
       }
     })()
-  }, [])
+  }, [currentPage])
 
   return !isLoading ? (
     <main className="relative flex flex-col gap-3">
@@ -293,6 +296,17 @@ function App() {
                 ))}
           </tbody>
         </table>
+      </div>
+      <div className="join w-full flex flex-wrap">
+        {Array.from({ length: pages }, (_, i) => (
+          <button
+            key={i}
+            className="join-item btn"
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
       </div>
       <Footer />
     </main>
