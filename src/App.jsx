@@ -5,6 +5,7 @@ import Select from 'react-select'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Skeleton from './components/Skeleton'
+import { formatCityName } from '../utils/helpers'
 
 function App() {
   const [totalBusinesses, setTotalBusinesses] = useState(0)
@@ -23,6 +24,20 @@ function App() {
     industry: null,
     year: null,
   })
+
+  const resultsPerPageOptions = [50, 100, 200, 300, 400, 500]
+
+  const searchEngineUrls = {
+    google: 'https://www.google.com/search?q=',
+    duckduckgo: 'https://duckduckgo.com/?q=',
+    bing: 'https://www.bing.com/search?q=',
+  }
+
+  const searchEngineOptions = [
+    { value: 'google', label: 'Google' },
+    { value: 'duckduckgo', label: 'DuckDuckGo' },
+    { value: 'bing', label: 'Bing' },
+  ]
 
   const handleClickCity = (clickedCity) => {
     setFilterOptions({ ...filterOptions, city: clickedCity })
@@ -56,20 +71,6 @@ function App() {
     localStorage.setItem('search_engine', selectedOption.value)
   }
 
-  const resultsPerPageOptions = [50, 100, 200, 300, 400, 500]
-
-  const searchEngineUrls = {
-    google: 'https://www.google.com/search?q=',
-    duckduckgo: 'https://duckduckgo.com/?q=',
-    bing: 'https://www.bing.com/search?q=',
-  }
-
-  const searchEngineOptions = [
-    { value: 'google', label: 'Google' },
-    { value: 'duckduckgo', label: 'DuckDuckGo' },
-    { value: 'bing', label: 'Bing' },
-  ]
-
   useEffect(() => {
     ;(async () => {
       setIsLoading(true)
@@ -86,6 +87,7 @@ function App() {
         const topCitiesData = await topCitiesRes.json()
         const searchEnginePreference = localStorage.getItem('search_engine')
         console.log(newBusinessesData)
+
         if (!searchEnginePreference) {
           setSearchEngine('google')
         } else {
@@ -93,16 +95,11 @@ function App() {
         }
 
         setBusinesses(newBusinessesData.data)
-        setPages(Math.floor(newBusinessesData.total / 50))
+        setPages(Math.ceil(newBusinessesData.total / 100))
         setTopCities(topCitiesData.map((el) => el.city))
         setCities(
           newBusinessesData.data
-            .map((el) =>
-              el.city
-                .split(' ')
-                .map((el) => el[0] + el.substring(1).toLowerCase())
-                .join(' ')
-            )
+            .map((el) => formatCityName(el.city))
             .filter((el, i, arr) => arr.lastIndexOf(el) === i)
             .sort((a, b) => a.localeCompare(b))
         )
@@ -117,7 +114,6 @@ function App() {
   return !isLoading ? (
     <main className="relative flex flex-col gap-3">
       <Navbar />
-
       {/* TOP STATISTICS CALLOUT: ROW 1 */}
       <div className="stats shadow flex flex-col md:flex-row mb-3">
         <div className="stat">
@@ -144,22 +140,7 @@ function App() {
       {/* FILTER INPUT FIELD */}
       <div className="flex gap-3 flex-col md:flex-row mb-3">
         <label className="input">
-          <svg
-            className="h-[1em] opacity-50"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-          >
-            <g
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="2.5"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.3-4.3"></path>
-            </g>
-          </svg>
+          <Icon icon="iconamoon:search-thin" />
           <input type="search" className="grow" placeholder="Search business" />
         </label>
         <select className="select">

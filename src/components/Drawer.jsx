@@ -36,7 +36,7 @@ function Drawer() {
           </li>
           <li>
             <a>
-              <Icon icon="gg:trending" className="text-lg" /> API
+              <Icon icon="material-symbols:cloud" className="text-lg" /> API
             </a>
           </li>
           <li>
