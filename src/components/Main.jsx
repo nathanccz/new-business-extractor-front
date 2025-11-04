@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
-import './App.css'
+
 import { Icon } from '@iconify/react'
 import Select from 'react-select'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Skeleton from './components/Skeleton'
-import { formatCityName } from '../utils/helpers'
 
-function App() {
+import Skeleton from './Skeleton'
+import { formatCityName } from '../../utils/helpers'
+import Toast from './Toast'
+
+function Main() {
   const [totalBusinesses, setTotalBusinesses] = useState(0)
   const [businesses, setBusinesses] = useState([])
   const [filtered, setFiltered] = useState(businesses)
@@ -19,6 +19,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1)
   const [topCities, setTopCities] = useState([])
   const [searchEngine, setSearchEngine] = useState('')
+  const [toastActive, setToastActive] = useState(false)
   const [filterOptions, setFilterOptions] = useState({
     city: null,
     industry: null,
@@ -71,6 +72,22 @@ function App() {
     localStorage.setItem('search_engine', selectedOption.value)
   }
 
+  const handleClickSave = async (businessId) => {
+    const businessToSave = businesses.find(
+      (business) => business.id === businessId
+    )
+
+    const savedBusinesses =
+      JSON.parse(localStorage.getItem('savedBusinesses')) || []
+
+    savedBusinesses.push(businessToSave)
+    localStorage.setItem('savedBusinesses', JSON.stringify(savedBusinesses))
+
+    setToastActive(true)
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+    setToastActive(false)
+  }
+
   useEffect(() => {
     ;(async () => {
       setIsLoading(true)
@@ -86,6 +103,9 @@ function App() {
         const newBusinessesData = await newBusinessesRes.json()
         const topCitiesData = await topCitiesRes.json()
         const searchEnginePreference = localStorage.getItem('search_engine')
+        const businessesInLocalStorage = JSON.parse(
+          localStorage.getItem('savedBusinesses')
+        )
         console.log(newBusinessesData)
 
         if (!searchEnginePreference) {
@@ -93,8 +113,16 @@ function App() {
         } else {
           setSearchEngine(searchEnginePreference)
         }
-
-        setBusinesses(newBusinessesData.data)
+        console.log(businessesInLocalStorage)
+        setBusinesses(
+          newBusinessesData.data.map((business) => {
+            return businessesInLocalStorage.some(
+              (entry) => entry.id === business.id
+            )
+              ? { ...business, isSaved: true }
+              : { ...business, isSaved: false }
+          })
+        )
         setPages(Math.ceil(newBusinessesData.total / 100))
         setTopCities(topCitiesData.map((el) => el.city))
         setCities(
@@ -112,8 +140,7 @@ function App() {
   }, [currentPage])
 
   return !isLoading ? (
-    <main className="relative flex flex-col gap-3">
-      <Navbar />
+    <>
       {/* TOP STATISTICS CALLOUT: ROW 1 */}
       <div className="stats shadow flex flex-col md:flex-row mb-3">
         <div className="stat">
@@ -240,14 +267,22 @@ function App() {
               <th></th>
               <th>Business Name</th>
               <th>City</th>
-              <th>Business Type</th>
+              <th>ZIP Code</th>
             </tr>
           </thead>
           <tbody>
             {isFiltering
               ? filtered.map((business, ind) => (
                   <tr className="hover:bg-base-300" key={business.id}>
-                    <th>{ind + 1}</th>
+                    <th>
+                      <Icon
+                        icon={`material-symbols:cloud${
+                          !business.isSaved ? '-outline' : ''
+                        }`}
+                        className="text-xl cursor-pointer"
+                        onClick={() => handleClickSave(business.id)}
+                      />
+                    </th>
                     <td className="font-bold">
                       <a
                         href={`${searchEngineUrls[searchEngine]}${business.businessName} Los Angeles`}
@@ -257,12 +292,21 @@ function App() {
                       </a>
                     </td>
                     <td>{business.city}</td>
-                    <td>Blue</td>
+                    <td>{business.zipCode}</td>
                   </tr>
                 ))
               : businesses.map((business, ind) => (
                   <tr className="hover:bg-base-300" key={business.id}>
-                    <th>{ind + 1}</th>
+                    <th>
+                      <Icon
+                        icon={`material-symbols:cloud${
+                          !business.isSaved ? '-outline' : ''
+                        }`}
+                        s
+                        className="text-xl cursor-pointer"
+                        onClick={() => handleClickSave(business.id)}
+                      />
+                    </th>
                     <td className="font-bold">
                       <a
                         href={`${searchEngineUrls[searchEngine]}${business.businessName} Los Angeles`}
@@ -272,7 +316,7 @@ function App() {
                       </a>
                     </td>
                     <td>{business.city}</td>
-                    <td>Blue</td>
+                    <td>{business.zipCode}</td>
                   </tr>
                 ))}
           </tbody>
@@ -291,11 +335,12 @@ function App() {
           </button>
         ))}
       </div>
-      <Footer />
-    </main>
+
+      {toastActive && <Toast />}
+    </>
   ) : (
     <Skeleton />
   )
 }
 
-export default App
+export default Main

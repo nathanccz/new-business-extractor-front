@@ -1,4 +1,5 @@
 import { Icon } from '@iconify/react'
+import { NavLink } from 'react-router-dom'
 
 function Drawer() {
   return (
@@ -19,15 +20,15 @@ function Drawer() {
         <ul className="menu bg-base-200 min-h-full w-80 p-4 text-lg">
           {/* Sidebar content here */}
           <li>
-            <a>
+            <NavLink to={'/'}>
               <Icon icon="material-symbols:home" className="text-lg" /> Home
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a>
+            <NavLink to={'/saved'}>
               <Icon icon="dashicons:cloud-saved" className="text-lg" /> Saved
               Businesses
-            </a>
+            </NavLink>
           </li>
           <li>
             <a>
