@@ -83,6 +83,14 @@ function Main() {
     savedBusinesses.push(businessToSave)
     localStorage.setItem('savedBusinesses', JSON.stringify(savedBusinesses))
 
+    setBusinesses(
+      businesses.map((bus) => {
+        return bus.id === businessId
+          ? (bus.isSaved = { ...bus, isSaved: true })
+          : bus
+      })
+    )
+
     setToastActive(true)
     await new Promise((resolve) => setTimeout(resolve, 3000))
     setToastActive(false)
