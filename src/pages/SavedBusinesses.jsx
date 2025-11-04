@@ -8,16 +8,16 @@ function SavedBusinesses() {
           Your saved businesses
         </li>
         {businesses.map((business, ind) => (
-          <li className="list-row">
+          <li className="list-row text-left">
             <div className="text-4xl font-thin opacity-30 tabular-nums">
               {(ind + 1).toString().padStart(2, '0')}
             </div>
-            {/* <div>
-            <img
-              className="size-10 rounded-box"
-              src="https://img.daisyui.com/images/profile/demo/1@94.webp"
-            />
-          </div> */}
+            <div>
+              <img
+                className="size-10 rounded-box"
+                src="https://img.daisyui.com/images/profile/demo/1@94.webp"
+              />
+            </div>
             <div className="list-col-grow">
               <div>{business.businessName}</div>
               <div className="text-xs uppercase font-semibold opacity-60">

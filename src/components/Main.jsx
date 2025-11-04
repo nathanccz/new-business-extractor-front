@@ -12,6 +12,7 @@ function Main() {
   const [businesses, setBusinesses] = useState([])
   const [filtered, setFiltered] = useState(businesses)
   const [isFiltering, setIsFiltering] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [cities, setCities] = useState([])
   const [resultsPerPage, setResultsPerPage] = useState(50)
   const [isLoading, setIsLoading] = useState(false)
@@ -72,21 +73,30 @@ function Main() {
     localStorage.setItem('search_engine', selectedOption.value)
   }
 
-  const handleClickSave = async (businessId) => {
-    const businessToSave = businesses.find(
+  const handleClickCloudIcon = async (businessId) => {
+    const clickedBusiness = businesses.find(
       (business) => business.id === businessId
     )
 
-    const savedBusinesses =
+    let savedBusinesses =
       JSON.parse(localStorage.getItem('savedBusinesses')) || []
 
-    savedBusinesses.push(businessToSave)
+    if (!clickedBusiness.isSaved) {
+      setIsSaving(true)
+      savedBusinesses.push(clickedBusiness)
+    } else {
+      setIsSaving(false)
+      savedBusinesses = [...savedBusinesses].filter(
+        (business) => business.id !== clickedBusiness.id
+      )
+    }
+
     localStorage.setItem('savedBusinesses', JSON.stringify(savedBusinesses))
 
     setBusinesses(
       businesses.map((bus) => {
         return bus.id === businessId
-          ? (bus.isSaved = { ...bus, isSaved: true })
+          ? (bus.isSaved = { ...bus, isSaved: !clickedBusiness.isSaved })
           : bus
       })
     )
@@ -111,17 +121,15 @@ function Main() {
         const newBusinessesData = await newBusinessesRes.json()
         const topCitiesData = await topCitiesRes.json()
         const searchEnginePreference = localStorage.getItem('search_engine')
-        const businessesInLocalStorage = JSON.parse(
-          localStorage.getItem('savedBusinesses')
-        )
-        console.log(newBusinessesData)
+        const businessesInLocalStorage =
+          JSON.parse(localStorage.getItem('savedBusinesses')) || []
 
         if (!searchEnginePreference) {
           setSearchEngine('google')
         } else {
           setSearchEngine(searchEnginePreference)
         }
-        console.log(businessesInLocalStorage)
+
         setBusinesses(
           newBusinessesData.data.map((business) => {
             return businessesInLocalStorage.some(
@@ -288,7 +296,7 @@ function Main() {
                           !business.isSaved ? '-outline' : ''
                         }`}
                         className="text-xl cursor-pointer"
-                        onClick={() => handleClickSave(business.id)}
+                        onClick={() => handleClickCloudIcon(business.id)}
                       />
                     </th>
                     <td className="font-bold">
@@ -312,7 +320,7 @@ function Main() {
                         }`}
                         s
                         className="text-xl cursor-pointer"
-                        onClick={() => handleClickSave(business.id)}
+                        onClick={() => handleClickCloudIcon(business.id)}
                       />
                     </th>
                     <td className="font-bold">
@@ -344,7 +352,7 @@ function Main() {
         ))}
       </div>
 
-      {toastActive && <Toast />}
+      {toastActive && <Toast isSaving={isSaving} />}
     </>
   ) : (
     <Skeleton />
