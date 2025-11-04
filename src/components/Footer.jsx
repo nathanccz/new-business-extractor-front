@@ -17,10 +17,10 @@ function Footer() {
               className="text-2xl"
             />
           </a>
-          <a>
+          <a href="https://github.com/nathanccz" target="_blank">
             <Icon icon="mdi:github" className="text-2xl" />
           </a>
-          <a>
+          <a href="mailto:nathanccz.dev@gmail.com">
             <Icon icon="ic:baseline-email" className="text-2xl" />
           </a>
         </div>

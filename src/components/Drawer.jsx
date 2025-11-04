@@ -47,9 +47,9 @@ function Drawer() {
             </a>
           </li>
           <li>
-            <a>
+            <NavLink to={'/contact'}>
               <Icon icon="mdi:contact" className="text-lg" /> Contact
-            </a>
+            </NavLink>
           </li>
         </ul>
       </div>

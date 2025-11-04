@@ -6,6 +6,7 @@ import SavedBusinesses from './pages/SavedBusinesses.jsx'
 import Main from './components/Main.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Dashboard from './pages/Dashboard.jsx'
+import Contact from './pages/Contact.jsx'
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: '/saved',
         element: <SavedBusinesses />,
+      },
+      {
+        path: '/contact',
+        element: <Contact />,
       },
     ],
   },
