@@ -21,8 +21,8 @@ function Contact() {
     console.log(formData)
   }
 
-  const URL = import.meta.env.VITE_EMAIL_ADDRESS
-  const API_KEY = import.meta.env.VITE_WEB3FORMS_KEY
+  const URL = 'https://api.web3forms.com/submit'
+  const API_KEY = 'd47698e3-8a71-4ffd-9718-069b8e763df7'
 
   const onFormSubmit = async (event) => {
     event.preventDefault()
