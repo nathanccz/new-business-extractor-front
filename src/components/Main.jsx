@@ -22,7 +22,7 @@ function Main() {
   const [searchEngine, setSearchEngine] = useState('')
   const [toastActive, setToastActive] = useState(false)
   const [filterOptions, setFilterOptions] = useState({
-    city: null,
+    city: '',
     industry: null,
     year: null,
   })
@@ -74,30 +74,40 @@ function Main() {
   }
 
   const handleClickCloudIcon = async (businessId) => {
+    //Find clicked business in business array
     const clickedBusiness = businesses.find(
       (business) => business.id === businessId
     )
+    //Set createAt date in business object
+    clickedBusiness.savedAt = new Date().toISOString()
 
+    //Retrieve saved businesses array from local storage--if it doesn't exist, set to empty array
     let savedBusinesses =
       JSON.parse(localStorage.getItem('savedBusinesses')) || []
 
+    //If the business is already saved, push it to the array of saved business
     if (!clickedBusiness.isSaved) {
       setIsSaving(true)
       savedBusinesses.push(clickedBusiness)
     } else {
+      //If it's not saved, remove it from the saved businesses array
       setIsSaving(false)
       savedBusinesses = [...savedBusinesses].filter(
         (business) => business.id !== clickedBusiness.id
       )
     }
-
+    //Set the new businesses in local storage
     localStorage.setItem('savedBusinesses', JSON.stringify(savedBusinesses))
 
+    //Set the isSaved flag on the business to true and update businesses array, so it re-renders and fills in cloud button
     setBusinesses(
-      businesses.map((bus) => {
-        return bus.id === businessId
-          ? (bus.isSaved = { ...bus, isSaved: !clickedBusiness.isSaved })
-          : bus
+      businesses.map((business) => {
+        return business.id === businessId
+          ? (business.isSaved = {
+              ...business,
+              isSaved: !clickedBusiness.isSaved,
+            })
+          : business
       })
     )
 
@@ -132,11 +142,15 @@ function Main() {
 
         setBusinesses(
           newBusinessesData.data.map((business) => {
-            return businessesInLocalStorage.some(
+            const isSaved = businessesInLocalStorage.some(
               (entry) => entry.id === business.id
             )
-              ? { ...business, isSaved: true }
-              : { ...business, isSaved: false }
+
+            return {
+              ...business,
+              city: formatCityName(business.city),
+              isSaved: isSaved,
+            }
           })
         )
         setPages(Math.ceil(newBusinessesData.total / 100))
@@ -171,8 +185,11 @@ function Main() {
         <div className="stat">
           <div className="stat-title mb-3">Top Neighborhoods</div>
           <div className="flex flex-wrap gap-3">
-            {topCities.map((city) => (
-              <div class="badge badge-accent cursor-pointer hover:bg-primary duration-500">
+            {topCities.map((city, ind) => (
+              <div
+                key={ind}
+                className="badge badge-accent cursor-pointer hover:bg-primary duration-500"
+              >
                 {city}
               </div>
             ))}
@@ -318,7 +335,6 @@ function Main() {
                         icon={`material-symbols:cloud${
                           !business.isSaved ? '-outline' : ''
                         }`}
-                        s
                         className="text-xl cursor-pointer"
                         onClick={() => handleClickCloudIcon(business.id)}
                       />

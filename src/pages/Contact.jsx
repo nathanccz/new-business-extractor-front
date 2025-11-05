@@ -56,7 +56,7 @@ function Contact() {
     }
   }
   return (
-    <div className="text-left my-10 p-5">
+    <div className="text-left my-10 p-5 h-[55vw]">
       <h1 className="font-bold text-2xl mb-3">Contact</h1>
       <p className="mb-8">
         Have questions, or need a cool site like this one? Feel free to reach
