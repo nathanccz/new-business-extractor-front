@@ -85,12 +85,12 @@ function Main() {
     let savedBusinesses =
       JSON.parse(localStorage.getItem('savedBusinesses')) || []
 
-    //If the business is already saved, push it to the array of saved business
+    //If the business is already saved, push it to the array of saved businesses
     if (!clickedBusiness.isSaved) {
       setIsSaving(true)
       savedBusinesses.push(clickedBusiness)
     } else {
-      //If it's not saved, remove it from the saved businesses array
+      //If it is already saved, remove it from the saved businesses array
       setIsSaving(false)
       savedBusinesses = [...savedBusinesses].filter(
         (business) => business.id !== clickedBusiness.id
