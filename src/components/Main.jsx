@@ -88,8 +88,11 @@ function Main() {
   }
 
   const handleClickCloudIcon = async (businessId) => {
+    //Grab either business array or filtered array based on whether isFiltering is true
+    const businessesArray = isFiltering ? [...filtered] : [...businesses]
+
     //Find clicked business in business array
-    const clickedBusiness = filtered.find(
+    const clickedBusiness = businessesArray.find(
       (business) => business.id === businessId
     )
 
@@ -115,16 +118,29 @@ function Main() {
     localStorage.setItem('savedBusinesses', JSON.stringify(savedBusinesses))
 
     //Set the isSaved flag on the business to true and update businesses array, so it re-renders and fills in cloud button
-    setFiltered(
-      filtered.map((business) => {
-        return business.id === businessId
-          ? (business.isSaved = {
-              ...business,
-              isSaved: !clickedBusiness.isSaved,
-            })
-          : business
-      })
-    )
+    if (isFiltering) {
+      setFiltered(
+        filtered.map((business) => {
+          return business.id === businessId
+            ? (business.isSaved = {
+                ...business,
+                isSaved: !clickedBusiness.isSaved,
+              })
+            : business
+        })
+      )
+    } else {
+      setBusinesses(
+        businesses.map((business) => {
+          return business.id === businessId
+            ? (business.isSaved = {
+                ...business,
+                isSaved: !clickedBusiness.isSaved,
+              })
+            : business
+        })
+      )
+    }
 
     setToastActive(true)
     await new Promise((resolve) => setTimeout(resolve, 3000))
