@@ -31,6 +31,12 @@ function Drawer() {
             </NavLink>
           </li>
           <li>
+            <NavLink to={'/notifications'}>
+              <Icon icon="mingcute:notification-fill" className="text-lg" />{' '}
+              Notifications
+            </NavLink>
+          </li>
+          <li>
             <a>
               <Icon icon="mdi:about" className="text-lg" /> About
             </a>

@@ -41,21 +41,35 @@ function Main() {
     { value: 'bing', label: 'Bing' },
   ]
 
-  const handleClickCity = (clickedCity) => {
-    setFilterOptions({ ...filterOptions, city: clickedCity })
-  }
-
-  const handleClickFilter = () => {
-    if (Object.values(filterOptions).every((option) => !option)) return
-
+  const handleClickCity = async (clickedCity) => {
+    setIsLoading(true)
     setIsFiltering(true)
 
-    const results = [...businesses].filter(
-      (business) =>
-        business.city.toLowerCase() === filterOptions.city.toLowerCase()
-    )
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/businesses/city/${clickedCity}`
+      )
+      const data = await response.json()
+      setFiltered(
+        data.data.map((business) => {
+          const saved = JSON.parse(localStorage.getItem('savedBusinesses'))
+          const isSaved = saved.some((entry) => entry.id === business.id)
 
-    setFiltered(results)
+          return {
+            ...business,
+            city: formatCityName(business.city),
+            isSaved: isSaved,
+          }
+        })
+      )
+      setIsLoading(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleClickFilter = async () => {
+    if (Object.values(filterOptions).every((option) => !option)) return
   }
 
   const handleClickReset = () => {
@@ -75,9 +89,10 @@ function Main() {
 
   const handleClickCloudIcon = async (businessId) => {
     //Find clicked business in business array
-    const clickedBusiness = businesses.find(
+    const clickedBusiness = filtered.find(
       (business) => business.id === businessId
     )
+
     //Set createAt date in business object
     clickedBusiness.savedAt = new Date().toISOString()
 
@@ -100,8 +115,8 @@ function Main() {
     localStorage.setItem('savedBusinesses', JSON.stringify(savedBusinesses))
 
     //Set the isSaved flag on the business to true and update businesses array, so it re-renders and fills in cloud button
-    setBusinesses(
-      businesses.map((business) => {
+    setFiltered(
+      filtered.map((business) => {
         return business.id === businessId
           ? (business.isSaved = {
               ...business,
@@ -189,6 +204,7 @@ function Main() {
               <div
                 key={ind}
                 className="badge badge-accent cursor-pointer hover:bg-primary duration-500"
+                onClick={() => handleClickCity(city)}
               >
                 {city}
               </div>

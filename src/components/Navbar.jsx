@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom'
 import Drawer from './Drawer'
 
 function Navbar() {
@@ -9,7 +10,9 @@ function Navbar() {
         </div>
       </div>
       <div className="navbar-center">
-        <a className="btn btn-ghost text-xl">NewBizLA</a>
+        <NavLink to={'/'} className="btn btn-ghost text-xl">
+          NewBizLA
+        </NavLink>
       </div>
       <div className="navbar-end">
         <button className="btn btn-ghost btn-circle">
