@@ -186,12 +186,7 @@ function Main() {
         )
         setPages(Math.ceil(newBusinessesData.total / 100))
         setTopCities(topCitiesData.map((el) => el.city))
-        setCities(
-          newBusinessesData.data
-            .map((el) => formatCityName(el.city))
-            .filter((el, i, arr) => arr.lastIndexOf(el) === i)
-            .sort((a, b) => a.localeCompare(b))
-        )
+        setCities(newBusinessesData.cities)
         setTotalBusinesses(newBusinessesData.total)
         setIsLoading(false)
       } catch (error) {
@@ -219,7 +214,9 @@ function Main() {
             {topCities.map((city, ind) => (
               <div
                 key={ind}
-                className="badge badge-accent cursor-pointer hover:bg-primary duration-500"
+                className={`badge badge-accent cursor-pointer hover:bg-primary duration-500 ${
+                  filtered[0].city === city && 'bg-primary'
+                }`}
                 onClick={() => handleClickCity(city)}
               >
                 {city}
@@ -333,6 +330,7 @@ function Main() {
               <th>Business Name</th>
               <th>City</th>
               <th>ZIP Code</th>
+              <th>Start Date</th>
             </tr>
           </thead>
           <tbody>
@@ -358,6 +356,7 @@ function Main() {
                     </td>
                     <td>{business.city}</td>
                     <td>{business.zipCode}</td>
+                    <td>{business.startDate}</td>
                   </tr>
                 ))
               : businesses.map((business, ind) => (
@@ -381,6 +380,7 @@ function Main() {
                     </td>
                     <td>{business.city}</td>
                     <td>{business.zipCode}</td>
+                    <td>{business.startDate}</td>
                   </tr>
                 ))}
           </tbody>
