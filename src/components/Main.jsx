@@ -41,14 +41,22 @@ function Main() {
     { value: 'bing', label: 'Bing' },
   ]
 
-  const handleClickCity = async (clickedCity) => {
+  const handleClickTableItem = async (clickedItem) => {
+    if (isFiltering && clickedItem === filtered[0].city) {
+      //If user clicks active city badge, reset.
+      handleClickReset()
+      return
+    }
+
     setIsLoading(true)
     setIsFiltering(true)
 
+    const URL = cities.includes(clickedItem)
+      ? `http://localhost:3000/api/businesses/city/${clickedItem}`
+      : `http://localhost:3000/api/businesses/zip/${clickedItem.split('-')[0]}`
+
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/businesses/city/${clickedCity}`
-      )
+      const response = await fetch(URL)
       const data = await response.json()
       setFiltered(
         data.data.map((business) => {
@@ -215,9 +223,9 @@ function Main() {
               <div
                 key={ind}
                 className={`badge badge-accent cursor-pointer hover:bg-primary duration-500 ${
-                  filtered[0].city === city && 'bg-primary'
+                  filtered[0]?.city === city && 'bg-primary'
                 }`}
-                onClick={() => handleClickCity(city)}
+                onClick={() => handleClickTableItem(city)}
               >
                 {city}
               </div>
@@ -245,7 +253,7 @@ function Main() {
             City
           </option>
           {cities.map((city, ind) => (
-            <option key={ind} onClick={() => handleClickCity(city)}>
+            <option key={ind} onClick={() => handleClickTableItem(city)}>
               {city}
             </option>
           ))}
@@ -354,8 +362,18 @@ function Main() {
                         {business.businessName}
                       </a>
                     </td>
-                    <td>{business.city}</td>
-                    <td>{business.zipCode}</td>
+                    <td
+                      className="cursor-pointer"
+                      onClick={() => handleClickTableItem(business.city)}
+                    >
+                      {business.city}
+                    </td>
+                    <td
+                      className="cursor-pointer"
+                      onClick={() => handleClickTableItem(business.zipCode)}
+                    >
+                      {business.zipCode}
+                    </td>
                     <td>{business.startDate}</td>
                   </tr>
                 ))
@@ -378,8 +396,18 @@ function Main() {
                         {business.businessName}
                       </a>
                     </td>
-                    <td>{business.city}</td>
-                    <td>{business.zipCode}</td>
+                    <td
+                      className="cursor-pointer"
+                      onClick={() => handleClickTableItem(business.city)}
+                    >
+                      {business.city}
+                    </td>
+                    <td
+                      className="cursor-pointer"
+                      onClick={() => handleClickTableItem(business.zipCode)}
+                    >
+                      {business.zipCode}
+                    </td>
                     <td>{business.startDate}</td>
                   </tr>
                 ))}
