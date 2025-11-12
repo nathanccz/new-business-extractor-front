@@ -77,7 +77,7 @@ function SavedBusinesses() {
           </ul>
         </div>
       </div>
-      <ul className="list bg-base-100 rounded-box shadow-md">
+      <ul className="list bg-base-100 rounded-box shadow-md overflow-y-scroll max-h-[45vw]">
         <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
           Your saved businesses
         </li>

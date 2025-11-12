@@ -23,8 +23,8 @@ function Main() {
   const [searchEngine, setSearchEngine] = useState('')
   const [toastActive, setToastActive] = useState(false)
   const [filterOptions, setFilterOptions] = useState({
-    city: '',
-    industry: null,
+    city: null,
+    zipCode: null,
     year: null,
   })
 
@@ -45,12 +45,20 @@ function Main() {
   const handleClickTableItem = async (clickedItem) => {
     if (isFiltering && clickedItem === filtered[0].city) {
       //If user clicks active city badge, reset.
+      setFilterOptions({})
       handleClickReset()
       return
     }
 
+    setFilterOptions({})
     setIsLoading(true)
     setIsFiltering(true)
+
+    const filterChoice = cities.includes(clickedItem)
+      ? { ...filterOptions, city: clickedItem }
+      : { ...filterOptions, zipCode: clickedItem }
+
+    setFilterOptions(filterChoice)
 
     const URL = cities.includes(clickedItem)
       ? `http://localhost:3000/api/businesses/city/${clickedItem}`
@@ -339,14 +347,16 @@ function Main() {
         </div>
       </div>
       <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 max-h-[60vh]">
-        <table className="table table-zebra">
+        <table className="table table-zebra relative">
           {/* head */}
-          <thead>
+          <thead className="sticky top-0 z-100 bg-base-200">
             <tr>
               <th></th>
               <th>Business Name</th>
-              <th>City</th>
-              <th>ZIP Code</th>
+              <th className={filterOptions.city ? 'bg-gray-600' : ''}>City</th>
+              <th className={filterOptions.zipCode ? 'bg-gray-600' : ''}>
+                ZIP Code
+              </th>
               <th>Start Date</th>
             </tr>
           </thead>
