@@ -1,7 +1,7 @@
 function Toast({ isSaving }) {
   return (
     <div className="toast toast-start">
-      <div className={`alert alert-${isSaving ? 'success' : 'neutral'}`}>
+      <div className={`alert ${isSaving ? 'alert-success' : 'alert-neutral'}`}>
         <span>
           {isSaving
             ? 'Business was saved successfully!'

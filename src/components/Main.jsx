@@ -14,6 +14,7 @@ function Main() {
   const [isFiltering, setIsFiltering] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [cities, setCities] = useState([])
+  const [zipCodes, setZipCodes] = useState([])
   const [resultsPerPage, setResultsPerPage] = useState(50)
   const [isLoading, setIsLoading] = useState(false)
   const [pages, setPages] = useState(null)
@@ -192,6 +193,12 @@ function Main() {
             }
           })
         )
+
+        setZipCodes(
+          newBusinessesData.data
+            .map((business) => business.zipCode)
+            .filter((el, ind, arr) => arr.lastIndexOf(el) === ind)
+        )
         setPages(Math.ceil(newBusinessesData.total / 100))
         setTopCities(topCitiesData.map((el) => el.city))
         setCities(newBusinessesData.cities)
@@ -242,19 +249,21 @@ function Main() {
         </label>
         <select className="select">
           <option disabled={true} selected>
-            Industry
-          </option>
-          <option>Crimson</option>
-          <option>Amber</option>
-          <option>Velvet</option>
-        </select>
-        <select className="select" value={filterOptions.city}>
-          <option disabled={true} selected>
             City
           </option>
           {cities.map((city, ind) => (
             <option key={ind} onClick={() => handleClickTableItem(city)}>
               {city}
+            </option>
+          ))}
+        </select>
+        <select className="select">
+          <option disabled={true} selected>
+            ZIP Code
+          </option>
+          {zipCodes.map((zip, ind) => (
+            <option key={ind} onClick={() => handleClickTableItem(zip)}>
+              {zip}
             </option>
           ))}
         </select>
