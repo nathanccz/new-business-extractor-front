@@ -1,6 +1,7 @@
 import { Icon } from '@iconify/react'
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import Toast from '../components/Toast'
+import NotesModal from '../components/NotesModal'
 
 function SavedBusinesses() {
   const [businesses, setBusinesses] = useState(
@@ -56,6 +57,10 @@ function SavedBusinesses() {
     setToastActive(false)
   }
 
+  const handleClickAddNote = () => {
+    document.getElementById('notes_modal').showModal()
+  }
+
   return businesses.length > 0 ? (
     <>
       <div className="h-[600px] relative">
@@ -95,7 +100,7 @@ function SavedBusinesses() {
             </ul>
           </div>
         </div>
-        <ul className="list bg-base-100 rounded-box shadow-md overflow-y-scroll max-h-[45vw]">
+        <ul className="list bg-base-100 rounded-box shadow-md overflow-y-scroll max-h-[50vh]">
           <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
             Your saved businesses
           </li>
@@ -120,9 +125,15 @@ function SavedBusinesses() {
                   className="dropdown-content menu bg-base-200 rounded-box z-100 w-52 p-2 shadow-sm"
                 >
                   <li>
+                    <a onClick={handleClickAddNote}>
+                      <Icon icon="material-symbols:add" className="text-lg" />
+                      Add note
+                    </a>
+                  </li>
+                  <li>
                     <a>
                       <Icon icon="proicons:note" className="text-lg" />
-                      Add note
+                      View notes
                     </a>
                   </li>
                   <li>
@@ -141,6 +152,7 @@ function SavedBusinesses() {
         </ul>
       </div>
       {toastActive && <Toast />}
+      <NotesModal />
     </>
   ) : (
     <p className="my-[25%]">There's nothing here, yet!</p>
