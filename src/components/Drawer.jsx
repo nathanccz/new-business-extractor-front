@@ -42,9 +42,9 @@ function Drawer() {
             </a>
           </li>
           <li>
-            <a>
+            <NavLink to={'/api-documentation'}>
               <Icon icon="material-symbols:cloud" className="text-lg" /> API
-            </a>
+            </NavLink>
           </li>
           <li>
             <a>

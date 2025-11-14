@@ -11,6 +11,7 @@ function SavedBusinesses() {
     localStorage.getItem('business_sort_preference')
   )
   const [toastActive, setToastActive] = useState(false)
+  const [businessToEdit, setBusinessToEdit] = useState({})
 
   useEffect(() => {
     sortBusinesses(businesses)
@@ -57,7 +58,8 @@ function SavedBusinesses() {
     setToastActive(false)
   }
 
-  const handleClickAddNote = () => {
+  const handleClickAddNote = (obj) => {
+    setBusinessToEdit(obj)
     document.getElementById('notes_modal').showModal()
   }
 
@@ -125,7 +127,7 @@ function SavedBusinesses() {
                   className="dropdown-content menu bg-base-200 rounded-box z-100 w-52 p-2 shadow-sm"
                 >
                   <li>
-                    <a onClick={handleClickAddNote}>
+                    <a onClick={() => handleClickAddNote(business)}>
                       <Icon icon="material-symbols:add" className="text-lg" />
                       Add note
                     </a>
@@ -152,7 +154,7 @@ function SavedBusinesses() {
         </ul>
       </div>
       {toastActive && <Toast />}
-      <NotesModal />
+      <NotesModal businessToEdit={businessToEdit} businesses={businesses} />
     </>
   ) : (
     <p className="my-[25%]">There's nothing here, yet!</p>
