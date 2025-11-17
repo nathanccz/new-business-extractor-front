@@ -4,7 +4,7 @@ import Footer from '../components/Footer'
 
 function Dashboard() {
   return (
-    <main className="relative flex flex-col gap-4 min-h-screen">
+    <main className="relative flex flex-col gap-4 h-screen">
       <Navbar />
       <Outlet />
       <Footer />

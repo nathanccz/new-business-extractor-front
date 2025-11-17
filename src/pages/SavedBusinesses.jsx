@@ -65,7 +65,7 @@ function SavedBusinesses() {
 
   return businesses.length > 0 ? (
     <>
-      <div className="h-[600px] relative">
+      <div className="h-[600px] relative grow-3">
         <div className="w-full flex justify-end">
           <div className="dropdown dropdown-left">
             <div tabIndex={0} role="button" className="btn m-1">

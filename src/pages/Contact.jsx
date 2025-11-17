@@ -59,7 +59,7 @@ function Contact() {
   return (
     <>
       <ScrollToTop />
-      <div className="text-left my-10 p-5">
+      <div className="text-left my-10 p-5 grow-3">
         <h1 className="font-bold text-2xl mb-3">Contact</h1>
         <p className="mb-8">
           Have questions, or need a cool site like this one? Feel free to reach

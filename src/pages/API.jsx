@@ -1,6 +1,6 @@
 function API() {
   return (
-    <div className="text-left mb-3">
+    <div className="text-left mb-3 grow-3">
       <h1 className="text-xl font-bold mb-3">Welcome!</h1>
       <p className="mb-3">
         Are you a developer who could use this data for your own purposes?
