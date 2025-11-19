@@ -153,8 +153,13 @@ function SavedBusinesses() {
           ))}
         </ul>
       </div>
-      {toastActive && <Toast />}
-      <NotesModal businessToEdit={businessToEdit} businesses={businesses} />
+
+      <NotesModal
+        businessToEdit={businessToEdit}
+        businesses={businesses}
+        setToastActive={setToastActive}
+        toastActive={toastActive}
+      />
     </>
   ) : (
     <p className="my-[25%]">There's nothing here, yet!</p>

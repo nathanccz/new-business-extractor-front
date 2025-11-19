@@ -1,11 +1,17 @@
-function Toast({ isSaving }) {
+function Toast({ isSaving, text }) {
   return (
     <div className="toast toast-start bg-base-200">
-      <div className={`alert ${isSaving ? 'alert-success' : 'alert-neutral'}`}>
+      <div
+        className={`alert ${
+          isSaving || text ? 'alert-success' : 'alert-neutral'
+        }`}
+      >
         <span>
           {isSaving
             ? 'Business was saved successfully!'
-            : 'Business was removed from your saved list.'}
+            : !text
+            ? 'Business was removed from your saved list.'
+            : text}
         </span>
       </div>
     </div>
